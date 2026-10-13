@@ -52,10 +52,16 @@ class Compressor:
 
     def compress(self, input_file, output_dir):
         self.process_file(input_file)
+        print(f"X: {self.X}")
+        print(f"N: {self.N}")
+        print(f"R: {self.R}")
+        print(f"Dlugosc tekstu: {self.k}")
         with open(output_dir, "wb") as out:
             out.write(bytes([self.X % 256]))
             out.write(bytes(self.dictionary))
             self.write_compressed(out, input_file)
+
+        print(f"Dlugosc po kompresji: {output_dir.stat().st_size}")
 
 
 
@@ -86,7 +92,7 @@ class Decompressor:
             bits = first[3:]
 
             buf = bytearray()
-            prev = None                      # bajt "w tyle" (może być ostatni)
+            prev = None
 
             while chunk := f.read(65536):
                 for b in chunk:
@@ -97,7 +103,7 @@ class Decompressor:
                 out.write(buf)
                 buf.clear()
 
-            # obsługa ostatniego bajtu: odcinamy R bitów wypełniacza
+            # obsługa ostatniego bajtu odcinamy R bitów wypełniacza
             if prev is not None:
                 bits += format(prev, "08b")[:8 - R]
             else:
